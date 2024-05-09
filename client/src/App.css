@@ -1,0 +1,18 @@
+.App {
+  position: relative;
+  height: calc(var(--vh, 1vh) * 100);
+}
+
+.Toastify__toast-body > div {
+  font-size: 1rem;
+  line-height: 1.275rem;
+  font-weight: 400;
+  font-family: "pretendard";
+  color: #4f4f4f;
+}
+.Toastify__toast-container {
+  width: fit-content !important;
+}
+.Toastify__toast {
+  min-width: 320px;
+}
