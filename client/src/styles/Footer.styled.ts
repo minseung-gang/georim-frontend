@@ -4,6 +4,7 @@ export const Wrapper = styled.footer`
   width: 100%;
   margin: 0 auto;
   border-top: 1px solid ${({ theme }) => theme.colors.greyScale4};
+  order:7;
 `;
 
 export const Inner = styled.div`

@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
 import * as Dev from "../../styles/project/project.styled";
-import { salesData } from "../../util/saleData";
 import Card from "../../component/project/Card";
 import { useRecoilState } from "recoil";
 import { headerStates } from "../../recoil/modal";
@@ -8,9 +7,24 @@ import { motion } from "framer-motion";
 import Breadcrumb from "../../component/Breadcrumb";
 import Cursor from "../../component/Cursor";
 import useHoverCursor from "../../hook/useHoverCursor";
+import { getPostsByCategory } from "../../apis/services/posts";
+import { State } from "../../reducer/postReducer";
+import { ICardType } from "../../types/type";
 
 function Sales() {
   const [state, setState] = useRecoilState(headerStates);
+  const [originalBuildings, setOriginalBuildings] = useState<ICardType[]>([]);
+  const [buildings, setBuildings] = useState(originalBuildings);
+  const [filteredBuildings, setFilteredBuildings] = useState(buildings);
+
+  useEffect(() => {
+    async function getPostsData() {
+      const response = await getPostsByCategory("sales");
+      setOriginalBuildings(response);
+      setFilteredBuildings(response);
+    }
+    getPostsData();
+  }, []);
 
   useEffect(() => {
     setState((prev) => ({ ...prev, headerDefault: true }));
@@ -19,9 +33,6 @@ function Sales() {
     });
   }, []);
 
-  const [originalBuildings] = useState(salesData);
-  const [buildings, setBuildings] = useState(originalBuildings);
-  const [filteredBuildings, setFilteredBuildings] = useState(buildings);
   const [filteredButton, setFilteredButton] = useState(0);
   const buttonList = [
     "전체",
@@ -68,7 +79,7 @@ function Sales() {
     setFilteredButton(index);
     if (index !== 0) {
       const filteredData = originalBuildings.filter((item) => {
-        return item.category.includes(text);
+        return item.type.includes(text);
       });
       setFilteredBuildings(filteredData);
       setBuildings(filteredData);
@@ -138,7 +149,7 @@ function Sales() {
               </Dev.SearchBtn>
             </Dev.SearchContainer>
           </Dev.ControlGroup>
-          {filteredBuildings.length !== 0 ? (
+          {filteredBuildings.length > 0 ? (
             <Card data={filteredBuildings} />
           ) : (
             <Dev.EmptyMessage>검색된 결과가 없습니다</Dev.EmptyMessage>

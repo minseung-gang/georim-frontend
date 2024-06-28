@@ -1,5 +1,17 @@
 import { atom } from "recoil";
 
+interface PromotionItem {
+  state: {
+    type: string;
+    name: string;
+    url: string;
+    image: any;
+    price?: number[];
+    pricePerRoom?: number[];
+    areaPrice?: number[];
+  }[];
+}
+
 export const buildingData = atom({
   key: "buildingData",
   default: {
@@ -12,5 +24,12 @@ export const NavigateState = atom({
   default: {
     subPage: "",
     currentPage: "",
+  },
+});
+
+export const pyengState = atom<PromotionItem>({
+  key: "pyengState",
+  default: {
+    state: [],
   },
 });

@@ -10,10 +10,15 @@ import BrandIdentity from "../component/home/BrandIdentity";
 import Cursor from "../component/Cursor";
 import styled from "styled-components";
 import { isBrowser, isMobile } from "react-device-detect";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { getPostsByCategory, getPromotionPosts } from "../apis/services/posts";
+import { ICardType } from "../types/type";
+import Footer from "../component/Footer";
 
 function Home() {
   const [headerState, setHeaderState] = useRecoilState(headerStates);
+  const [salesData, setData] = useState<ICardType[]>([]);
+  const [promotionData, setPromotionData] = useState([]);
 
   const handleMouseEnter = () => {
     setHeaderState((prev) => ({ ...prev, headerDefault: true }));
@@ -21,6 +26,23 @@ function Home() {
   const handleMouseLeave = () => {
     setHeaderState((prev) => ({ ...prev, headerDefault: false }));
   };
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const sales = await getPostsByCategory("sales");
+        const promotions = await getPromotionPosts();
+        setData(sales);
+        setPromotionData(promotions);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    if (salesData.length === 0) {
+      fetchData();
+    }
+  }, []);
 
   useEffect(() => {
     if (isBrowser) {
@@ -38,9 +60,10 @@ function Home() {
           <Banner />
           <BrandIdentity />
           <BusinessAchievements />
-          <Projects />
-          <SalesInfo />
+          <Projects props={salesData} />
+          <SalesInfo props={promotionData} />
           <ContactUs />
+          <Footer />
         </FullPageScroll>
       )}
       {isMobile && (
@@ -48,9 +71,10 @@ function Home() {
           <Banner />
           <BrandIdentity />
           <BusinessAchievements />
-          <Projects />
-          <SalesInfo />
+          <Projects props={salesData} />
+          <SalesInfo props={promotionData} />
           <ContactUs />
+          <Footer />
         </>
       )}
     </Wrapper>

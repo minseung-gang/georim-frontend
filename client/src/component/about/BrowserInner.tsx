@@ -53,7 +53,7 @@ function BrowserInner({ index, sectionRefs }: BrowserInnerProps) {
               </History.Project>
               <History.Img>
                 <img
-                  src={process.env.PUBLIC_URL + "/images/project_02.png"}
+                  src={process.env.PUBLIC_URL + "/images/history_02.jpg"}
                   alt="두산 N플레이스"
                 />
               </History.Img>
@@ -70,7 +70,7 @@ function BrowserInner({ index, sectionRefs }: BrowserInnerProps) {
               <History.Project>부산지사 개설</History.Project>
               <History.Img>
                 <img
-                  src={process.env.PUBLIC_URL + "/images/sales_08.png"}
+                  src={process.env.PUBLIC_URL + "/images/history_03.jpg"}
                   alt="펜타플렉스 부산"
                 />
               </History.Img>
@@ -88,7 +88,7 @@ function BrowserInner({ index, sectionRefs }: BrowserInnerProps) {
               </History.Project>
               <History.Img>
                 <img
-                  src={process.env.PUBLIC_URL + "/images/project_04.png"}
+                  src={process.env.PUBLIC_URL + "/images/history_04.jpg"}
                   alt="범어 N타워"
                 />
               </History.Img>
@@ -108,7 +108,7 @@ function BrowserInner({ index, sectionRefs }: BrowserInnerProps) {
               </History.Project>
               <History.Img>
                 <img
-                  src={process.env.PUBLIC_URL + "/images/project_03.png"}
+                  src={process.env.PUBLIC_URL + "/images/history_05.jpg"}
                   alt="나비 메디컬타워"
                 />
               </History.Img>
@@ -126,7 +126,7 @@ function BrowserInner({ index, sectionRefs }: BrowserInnerProps) {
               </History.Project>
               <History.Img>
                 <img
-                  src={process.env.PUBLIC_URL + "/images/project_05.png"}
+                  src={process.env.PUBLIC_URL + "/images/history_06.png"}
                   alt="나비프라자"
                 />
               </History.Img>
@@ -147,7 +147,7 @@ function BrowserInner({ index, sectionRefs }: BrowserInnerProps) {
               </History.Project>
               <History.Img>
                 <img
-                  src={process.env.PUBLIC_URL + "/images/project_06.png"}
+                  src={process.env.PUBLIC_URL + "/images/history_07.png"}
                   alt="나비타워"
                 />
               </History.Img>

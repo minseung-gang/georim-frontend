@@ -50,7 +50,7 @@ function App() {
         <ToastContainer limit={1} />
 
         <Routes>
-          <Route element={<RouteLayout footer={false} />}>
+          <Route element={<RouteLayout footer={false} topBtn={false} />}>
             <Route path="/" element={<Home />} />
           </Route>
           <Route element={<RouteLayout />}>

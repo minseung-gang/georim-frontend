@@ -103,6 +103,8 @@ export const Wrapper = styled.div`
         }
         img {
           border-radius: 2px;
+          object-fit: cover;
+          object-position: bottom;
         }
       }
       tr {

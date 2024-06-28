@@ -5,8 +5,8 @@ import { useRecoilValue } from "recoil";
 
 import { onSilentRefresh } from "../../apis/services/user";
 const AuthLayout = () => {
-  const [refreshCompleted, setRefreshCompleted] = useState(true);
-  /*  useEffect(() => {
+  const [refreshCompleted, setRefreshCompleted] = useState(false);
+  useEffect(() => {
     async function refreshAndNavigate() {
       try {
         await onSilentRefresh(user.username);
@@ -16,7 +16,7 @@ const AuthLayout = () => {
       }
     }
     refreshAndNavigate();
-  }, []); */
+  }, []);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const user = useRecoilValue(LoginState);

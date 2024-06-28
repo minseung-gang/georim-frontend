@@ -15,7 +15,7 @@ import { sortData } from "../../util/filterPosts";
 interface IDataType {
   id: number;
   name: string;
-  type: string;
+  type: string[];
   url: string;
   category: string;
   address: string;
@@ -32,14 +32,15 @@ interface IDataType {
 function Contents() {
   const { username } = useRecoilValue(LoginState);
   const [state, dispatch] = useReducer(reducer, initialState);
-
   //dataList
   const [dataList, setDataList] = useState<IDataType[]>([]);
   const [filteredList, setFilteredList] = useState<IDataType[]>(dataList);
+  const result = dataList.filter((post) => {
+    return post.type.includes("근린");
+  });
+  console.log(result, "data");
   //searchfilter
   const [searchState, setSearchState] = useRecoilState(SearchState);
-  //filter button
-  const [count, setCount] = useState(0);
   //vertical ellipsis
   const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
   //pagination
@@ -233,7 +234,9 @@ function Contents() {
                   const reversedIdx =
                     filteredList.length - (firstPostIndex + idx); // 역순으로 순번을 매김
                   const isExpanded = expandedItemId === idx;
-
+                  const category =
+                    item.category == "sales" ? "분양·입주" : "시행·개발";
+                  const type = item.type.join(",");
                   return (
                     <tr key={idx}>
                       <td>{reversedIdx}</td>
@@ -241,13 +244,15 @@ function Contents() {
                         <img
                           width={120}
                           height={80}
-                          src={`${process.env.REACT_APP_BASE_URL}/dir/image/${item.url}`}
+                          src={`${process.env.REACT_APP_SERVER_IP}/dir/image/${
+                            item.url
+                          }?${Date.now()}`}
                           alt="이미지"
                         />
                       </td>
-                      <td>{item.category}</td>
+                      <td>{category}</td>
                       <td>{item.name}</td>
-                      <td>{item.type}</td>
+                      <td>{type}</td>
                       <td>{item.address}</td>
                       <td>{item.houseHold}</td>
                       <td>

@@ -4,6 +4,8 @@ import * as Styles from "../../styles/admin/home.styled";
 import { logout } from "../../apis/services/user";
 import { useNavigate } from "react-router-dom";
 import { authInstance } from "../../apis/utils/instance";
+import { useSetRecoilState } from "recoil";
+import { LoginState } from "../../recoil/LoginState";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,12 +16,12 @@ interface LayoutProps {
 
 function Layout({ children, title, header = true, page }: LayoutProps) {
   const navigate = useNavigate();
+  const setState = useSetRecoilState(LoginState);
   const handleLogout = async () => {
     const res = await logout();
     if (res) {
       delete authInstance.defaults.headers.common["Authorization"];
-      document.cookie =
-        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      setState({ username: "" });
       navigate("/admin");
     }
   };

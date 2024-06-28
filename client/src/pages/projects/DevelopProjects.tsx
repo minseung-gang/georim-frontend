@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
 import * as Dev from "../../styles/project/project.styled";
-import { buildingData } from "../../util/data";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { headerStates } from "../../recoil/modal";
@@ -9,9 +8,23 @@ import Breadcrumb from "../../component/Breadcrumb";
 import Image from "../../component/LazyImage";
 import Cursor from "../../component/Cursor";
 import useHoverCursor from "../../hook/useHoverCursor";
+import { getPostsByCategory } from "../../apis/services/posts";
+import { filter } from "lodash";
+import Card from "../../component/project/Card";
 
 function DevelopProjects() {
   const [state, setState] = useRecoilState(headerStates);
+  const [buildings, setBuildings] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState(buildings);
+
+  useEffect(() => {
+    async function getPostsData() {
+      const response = await getPostsByCategory("development");
+      setBuildings(response);
+      setFilteredData(response);
+    }
+    getPostsData();
+  }, []);
 
   useEffect(() => {
     setState((prev) => ({ ...prev, headerDefault: true }));
@@ -21,7 +34,7 @@ function DevelopProjects() {
   }, []);
 
   const navigate = useNavigate();
-  const [buildings, setBuildings] = useState(buildingData);
+
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { cursor, handleHover, handleLeave } = useHoverCursor();
 
@@ -46,12 +59,12 @@ function DevelopProjects() {
     // 입력된 값에 대한 작업 수행
     const inputValue = inputRef.current?.value.toLowerCase().trim();
     if (inputValue) {
-      const filteredResult = buildingData.filter((item) =>
+      const filteredResult = buildings.filter((item) =>
         item.name.toLowerCase().includes(inputValue)
       );
-      setBuildings(filteredResult);
+      setFilteredData(filteredResult);
     } else if (inputValue == "") {
-      setBuildings(buildingData);
+      setFilteredData(buildings);
     }
   };
 
@@ -88,7 +101,7 @@ function DevelopProjects() {
         <Dev.BuildingsForm>
           <Dev.SearchContainer>
             <Dev.ProjectCount>
-              총 <span>{buildings.length}</span>개의 프로젝트가 있습니다.
+              총 <span>{filteredData?.length}</span>개의 프로젝트가 있습니다.
             </Dev.ProjectCount>
             <Dev.SearchBtn>
               <input
@@ -101,56 +114,8 @@ function DevelopProjects() {
               <Dev.SearchIcon onClick={handleSearch} />
             </Dev.SearchBtn>
           </Dev.SearchContainer>
-          {buildings.length > 0 ? (
-            <Dev.GridContainer>
-              {buildings.map((item, idx) => {
-                const lowerFloor = item.scale.split("/")[0];
-                const higherFloor = item.scale.split("/")[1];
-                return (
-                  <Dev.BuildingsCard
-                    className="card"
-                    onClick={() => navigate(`/project/development/${item.id}`)}
-                    key={idx}
-                    onMouseEnter={handleHover}
-                    onMouseLeave={handleLeave}
-                  >
-                    <Dev.ImageBox>
-                      <Image
-                        src={item.img}
-                        alt="빌딩 이미지"
-                        width={380}
-                        height={280}
-                      />
-                    </Dev.ImageBox>
-                    <Dev.CardContent>
-                      <div>
-                        <Dev.BuildingsName>{item.name}</Dev.BuildingsName>
-                      </div>
-                      <Dev.ContentInfo>
-                        <Dev.ContentItem>
-                          <Dev.TitleInfo>구분</Dev.TitleInfo>
-                          <Dev.ContentDetails>
-                            {item.category}
-                          </Dev.ContentDetails>
-                        </Dev.ContentItem>
-                        <Dev.ContentItem>
-                          <Dev.TitleInfo>세대수</Dev.TitleInfo>
-                          <Dev.ContentDetails>
-                            {item.houseHoldSum}
-                          </Dev.ContentDetails>
-                        </Dev.ContentItem>
-                        <Dev.ContentItem>
-                          <Dev.TitleInfo>규모</Dev.TitleInfo>
-                          <Dev.ContentDetails>
-                            {lowerFloor} - {higherFloor}
-                          </Dev.ContentDetails>
-                        </Dev.ContentItem>
-                      </Dev.ContentInfo>
-                    </Dev.CardContent>
-                  </Dev.BuildingsCard>
-                );
-              })}
-            </Dev.GridContainer>
+          {filteredData.length > 0 ? (
+            <Card data={filteredData} />
           ) : (
             <Dev.EmptyMessage>검색된 결과가 없습니다</Dev.EmptyMessage>
           )}

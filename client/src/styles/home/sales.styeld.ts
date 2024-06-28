@@ -364,8 +364,7 @@ export const RightArrow2 = styled(IoIosArrowRoundForward)`
   font-size: 24px;
 `;
 export const Image = styled.div<{ $link: string }>`
-  background: url(${(props) => props.$link}) no-repeat;
-  background-size: cover;
+  position: relative;
   background-position: bottom;
   width: 100%;
   height: 100%;
@@ -374,6 +373,14 @@ export const Image = styled.div<{ $link: string }>`
   width: 100%;
   max-width: 800px;
   aspect-ratio: 8/6;
+  & > img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+  }
 
   @media screen and (max-width: 1536px) {
     width: 100%;
@@ -382,7 +389,9 @@ export const Image = styled.div<{ $link: string }>`
   }
 `;
 export const ImageContainer = styled.div`
-  position: relative;
+  position: absolute;
+  bottom: 0;
+  right: 0;
   display: flex;
   height: 100%;
   width: 100%;

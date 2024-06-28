@@ -1,51 +1,55 @@
-export const ALLOW_FILE_EXTENSION = "jpg,jpeg,png,svg";
-export const MAX_FILE_SIZE_IN_MB = 1.5 * 1024 * 1024;
+import { State } from "../reducer/postReducer";
 
-/**
- * 파일 확장자를 검사해주는 함수입니다.
- * @param param
- * @returns true: 가능 확장자, false : 불가능 확장자
- *
- */
-const fileExtensionValid = ({ name }: { name: string }): boolean => {
-  const extension = removeFileName(name);
+export const handleCheckData = (state: State) => {
+  const {
+    category,
+    name,
+    image,
+    url,
+    type,
+    address,
+    houseHold,
+    lowFloor,
+    highFloor,
+    floorAreaRatio,
+    buildingCoverRatio,
+    lotArea,
+    totalFloorArea,
+    developmentDate,
+  } = state;
 
-  if (!(ALLOW_FILE_EXTENSION.indexOf(extension) > -1) || extension === "") {
-    return false;
+  // "sales" 카테고리인 경우와 그렇지 않은 경우에 따라 다른 유효성 검사를 수행
+  if (category === "sales") {
+    if (
+      name === "" ||
+      url === "" ||
+      type.length === 0 ||
+      address === "" ||
+      houseHold === "" ||
+      lowFloor === "" ||
+      highFloor === ""
+    ) {
+      return false;
+    }
+  } else {
+    // "sales" 카테고리가 아닌 경우
+
+    if (
+      name === "" ||
+      url === "" ||
+      type.length === 0 ||
+      address === "" ||
+      houseHold === "" ||
+      lowFloor === "" ||
+      highFloor === "" ||
+      floorAreaRatio === 0 ||
+      buildingCoverRatio === 0 ||
+      lotArea === 0 ||
+      totalFloorArea === 0 ||
+      developmentDate === ""
+    ) {
+      return false;
+    }
   }
   return true;
 };
-
-/**
- * 해당 함수의 기능은 .을 제거한 순수 파일 확장자를 return해줍니다.
- * @param originalFileName 업로드할 파일명
- * @returns .을 제거한 순수 파일 확장자(png, jpg 등)
- */
-const removeFileName = (originalFileName: string): string => {
-  const lastIndex = originalFileName.lastIndexOf(".");
-
-  if (lastIndex < 0) {
-    return "";
-  }
-
-  return originalFileName.substring(lastIndex + 1).toLowerCase();
-};
-
-export function checkFileValidity(file: File) {
-  // 파일 확장자 유효성 검사
-  if (!fileExtensionValid(file)) {
-    alert(
-      `업로드 가능한 확장자가 아닙니다. [가능한 확장자 : ${ALLOW_FILE_EXTENSION}]`
-    );
-    return false;
-  }
-
-  // 파일 용량 체크
-  if (file.size > MAX_FILE_SIZE_IN_MB) {
-    alert(
-      `업로드 가능한 최대 용량은 ${MAX_FILE_SIZE_IN_MB / 1024 / 1024}MB입니다.`
-    );
-    return false;
-  }
-  return true;
-}

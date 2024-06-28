@@ -135,7 +135,7 @@ export const TitleContainer = styled.div`
     justify-content: space-between;
     align-items: flex-start;
     flex-direction: column;
-    padding: 0 16px;
+    padding: 0 20px;
     gap: 8px 0;
   }
 `;
@@ -165,6 +165,7 @@ export const TitleCaption = styled(motion.div)`
       text-align: center;
       color: ${({ theme }) => theme.colors.gray6};
       font-weight: 500;
+ 
     }
   }
   & h2 {

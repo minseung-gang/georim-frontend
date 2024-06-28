@@ -3,33 +3,36 @@ import { useSearchParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { headerStates } from "../../recoil/modal";
 import { promotionData } from "../../util/saleData";
-import Layout from "../../component/Layout";
 import * as Sales from "../../styles/news/saleApartmentDetail.styled";
 import Tabs from "../../component/molecule/Tabs";
 import KaKaoMap from "../../component/news/KaKaoMap";
 import Title from "../../component/Title";
 import Breadcrumb from "../../component/Breadcrumb";
-
-interface PyengWithPrice {
-  type: string;
-  image: string;
-  price: number[];
-}
-
-interface PyengWithAreaPrice {
-  type: string;
-  image: string;
-  pricePerRoom: number[];
-  areaPrice: number[];
-}
+import { getPromotionById } from "../../apis/services/posts";
+import { ICardType } from "../../types/type";
 
 function SaleApartmentDetail() {
   const [state, setState] = useRecoilState(headerStates);
+  const [data, setData] = useState<ICardType>();
   const [isMobile, setIsMobile] = useState(false);
   const [searchParams] = useSearchParams();
 
+  console.log(data, "data");
+  async function fetchProductData() {
+    const id = searchParams.get("order");
+    try {
+      if (id) {
+        const response = await getPromotionById(parseInt(id));
+
+        setData(response);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   useEffect(() => {
     setState((prev) => ({ ...prev, headerDefault: false }));
+    fetchProductData();
     window.scrollTo(0, 0);
   }, []);
 
@@ -46,28 +49,14 @@ function SaleApartmentDetail() {
     };
   }, []);
 
-  const buildOrd = parseInt(searchParams.get("order") ?? "") - 1;
-  const {
-    name,
-    category,
-    image,
-    pyeng,
-    location,
-    phone,
-    houseHoldSum,
-    inDate,
-    fileLink,
-    homepage,
-    map,
-  } = promotionData[buildOrd];
-  const year = inDate?.split("-")[0];
-  const month = inDate?.split("-")[1];
+  const year = data?.developmentDate?.split(".")[0];
+  const month = data?.developmentDate?.split(".")[1];
   const handleDownloadPDF = () => {
-    const pdfURL = fileLink;
+    const pdfURL = data?.fileLink;
     window.open(pdfURL, "_blank");
   };
   const moveToPage = () => {
-    window.open(homepage, "_blank");
+    window.open(data?.homepage, "_blank");
   };
   return (
     <Sales.Wrapper>
@@ -76,11 +65,14 @@ function SaleApartmentDetail() {
         <div>
           <Sales.Section className="product-section">
             <Sales.TitleBox>
-              <Title data={name} />
+              <Title data={data?.name ?? ""} />
               <Sales.Message>SCROLL DOWN</Sales.Message>
             </Sales.TitleBox>
             <Sales.ImgContainer>
-              <img src={image} alt={name} />
+              <img
+                src={`${process.env.REACT_APP_SERVER_IP}/dir/image/${data?.url}`}
+                alt={data?.name}
+              />
             </Sales.ImgContainer>
           </Sales.Section>
           <Sales.AptInfo>
@@ -88,20 +80,20 @@ function SaleApartmentDetail() {
               <Sales.Section className="product-info">
                 <Sales.InfoHeader>
                   <Sales.FlexRow>
-                    <Sales.InfoTitle>{name}</Sales.InfoTitle>
+                    <Sales.InfoTitle>{data?.name}</Sales.InfoTitle>
                     <Sales.PromotionBtn>분양중</Sales.PromotionBtn>
                   </Sales.FlexRow>
 
                   {isMobile ? (
-                    <Sales.MobilePhone href={"tel:" + phone}>
+                    <Sales.MobilePhone href={"tel:" + data?.phone}>
                       <Sales.PhoneIcon />
 
-                      {phone}
+                      {data?.phone}
                     </Sales.MobilePhone>
                   ) : (
                     <Sales.FlexRow>
                       <Sales.PhoneIcon />
-                      <Sales.WebPhone>{phone}</Sales.WebPhone>
+                      <Sales.WebPhone>{data?.phone}</Sales.WebPhone>
                     </Sales.FlexRow>
                   )}
                 </Sales.InfoHeader>
@@ -111,14 +103,16 @@ function SaleApartmentDetail() {
                       <Sales.CategoryIcon />
                       <Sales.CardTitle>구분</Sales.CardTitle>
                     </div>
-                    <Sales.CardContent>{category}</Sales.CardContent>
+                    <Sales.CardContent>
+                      {data?.type.join(", ")}
+                    </Sales.CardContent>
                   </Sales.InfoCard>
                   <Sales.InfoCard>
                     <div>
                       <Sales.LocationIcon />
                       <Sales.CardTitle>위치</Sales.CardTitle>
                     </div>
-                    <Sales.CardContent>{location}</Sales.CardContent>
+                    <Sales.CardContent>{data?.address}</Sales.CardContent>
                   </Sales.InfoCard>
                   <Sales.InfoCard>
                     <div>
@@ -134,12 +128,12 @@ function SaleApartmentDetail() {
                       <Sales.DoorIcon />
                       <Sales.CardTitle>호실수</Sales.CardTitle>
                     </div>
-                    <Sales.CardContent>{houseHoldSum}</Sales.CardContent>
+                    <Sales.CardContent>{data?.houseHold}</Sales.CardContent>
                   </Sales.InfoCard>
                 </Sales.InfoContent>
               </Sales.Section>
               <Sales.Btn>
-                {fileLink && (
+                {data?.fileLink && (
                   <Sales.BtnIcon>
                     <button onClick={() => handleDownloadPDF()}>
                       <Sales.FileIcon />
@@ -147,7 +141,7 @@ function SaleApartmentDetail() {
                     </button>
                   </Sales.BtnIcon>
                 )}
-                {homepage && (
+                {data?.homepage && (
                   <Sales.BtnIcon>
                     <button onClick={() => moveToPage()}>
                       <Sales.HomeIcons />
@@ -161,195 +155,144 @@ function SaleApartmentDetail() {
               <Tabs value={0}>
                 <Sales.SectionTitle>
                   <h4>분양가 안내</h4>
-                  {pyeng.length > 1 && (
+                  {data?.pyeng && (
                     <Tabs.List>
-                      {pyeng.map((item, idx) => {
-                        return (
-                          <Tabs.Trigger value={idx} key={item.type + idx}>
-                            <Sales.TriggerText>{item.type}</Sales.TriggerText>
-                          </Tabs.Trigger>
-                        );
-                      })}
+                      {data.pyeng.length > 1 &&
+                        data?.pyeng.map((item, idx) => {
+                          return (
+                            <Tabs.Trigger value={idx} key={item.type + idx}>
+                              <Sales.TriggerText>{item.name}</Sales.TriggerText>
+                            </Tabs.Trigger>
+                          );
+                        })}
                     </Tabs.List>
                   )}
                 </Sales.SectionTitle>
-                {pyeng.length > 1
-                  ? pyeng.map((item, idx) => {
-                      // item의 타입에 따라서 다르게 처리
-                      if ("price" in item) {
-                        // PyengWithPrice 타입의 경우
-                        const pyengItem = item as PyengWithPrice;
-                        return (
-                          <Tabs.Panel key={idx} value={idx}>
-                            <Sales.PyengContent>
-                              <Sales.PyeongImage>
-                                <img
-                                  src={pyengItem.image}
-                                  alt="평면도 이미지"
-                                />
-                              </Sales.PyeongImage>
-                              <Sales.PyengInfo>
-                                <Sales.PyengInner>
-                                  <Sales.PyengTitle>
-                                    {item.type} 타입
-                                  </Sales.PyengTitle>
-                                  <Sales.PyengValue>
-                                    최저
-                                    <span>
-                                      <Sales.Price>
-                                        {pyengItem.price[0].toLocaleString()}
-                                      </Sales.Price>
-                                      만원
-                                    </span>
-                                    ~ 최고
-                                    <span>
-                                      <Sales.Price>
-                                        {pyengItem.price[1].toLocaleString()}
-                                      </Sales.Price>
-                                      만원
-                                    </span>
-                                  </Sales.PyengValue>
-                                </Sales.PyengInner>
-
-                                <Sales.Description>
-                                  * 본 홈페이지에 사용된 평면도는 입주자의
-                                  이해를 돕기 위해 제작된 것으로 실제와 차이가
-                                  있을 수 있으며, 각종 인·허가 과정이나 현장
-                                  여건 등에 따라 변경 사항이 있을 수 있습니다.
-                                </Sales.Description>
-                              </Sales.PyengInfo>
-                            </Sales.PyengContent>
-                          </Tabs.Panel>
-                        );
-                      } else {
-                        // PyengWithAreaPrice 타입의 경우
-                        const pyengItem = item as PyengWithAreaPrice;
-                        return (
-                          <Tabs.Panel key={idx} value={idx}>
-                            <Sales.PyengContent>
-                              <Sales.PyeongImage>
-                                <img src={pyengItem.image} alt="" />
-                              </Sales.PyeongImage>
-                              <Sales.PyengInfo>
-                                <div>
-                                  <Sales.PyengTitle>호실당</Sales.PyengTitle>
-                                  <Sales.PyengValue>
-                                    최저
-                                    <span>
-                                      <Sales.Price>
-                                        {pyengItem.pricePerRoom[0].toLocaleString()}
-                                      </Sales.Price>
-                                      만원
-                                    </span>
-                                    ~ 최고
-                                    <span>
-                                      <Sales.Price>
-                                        {pyengItem.pricePerRoom[1].toLocaleString()}
-                                      </Sales.Price>
-                                      만원
-                                    </span>
-                                  </Sales.PyengValue>
-                                </div>
-                                <div>
-                                  <Sales.PyengTitle>평당가</Sales.PyengTitle>
-                                  <Sales.PyengValue>
-                                    최저
-                                    <span>
-                                      <Sales.Price>
-                                        {pyengItem.areaPrice[0].toLocaleString()}
-                                      </Sales.Price>
-                                      만원
-                                    </span>
-                                    ~ 최고
-                                    <span>
-                                      <Sales.Price>
-                                        {pyengItem.areaPrice[1].toLocaleString()}
-                                      </Sales.Price>
-                                      만원
-                                    </span>
-                                  </Sales.PyengValue>
-                                </div>
-                                <Sales.Description>
-                                  * 본 홈페이지에 사용된 평면도는 입주자의
-                                  이해를 돕기 위해 제작된 것으로 실제와 차이가
-                                  있을 수 있으며, 각종 인·허가 과정이나 현장
-                                  여건 등에 따라 변경 사항이 있을 수 있습니다.
-                                </Sales.Description>
-                              </Sales.PyengInfo>
-                            </Sales.PyengContent>
-                          </Tabs.Panel>
-                        );
-                      }
-                    })
-                  : pyeng.map((item, idx) => {
-                      const pyengItem = item as PyengWithAreaPrice;
+                {data?.pyeng &&
+                  data.pyeng.map((item, idx) => {
+                    // item의 타입에 따라서 다르게 처리
+                    console.log("평 이미지", item);
+                    if ("price" in item) {
+                      // PyengWithPrice 타입의 경우
 
                       return (
-                        <Sales.PyengContent key={idx}>
-                          <Sales.PyeongImage>
-                            <img src={pyengItem.image} alt="" />
-                          </Sales.PyeongImage>
-                          <Sales.PyengInfo>
-                            <div>
-                              <Sales.PyengTitle>호실당</Sales.PyengTitle>
-                              <Sales.PyengValue>
-                                최저
-                                <span>
-                                  <Sales.Price>
-                                    {pyengItem.pricePerRoom[0].toLocaleString()}
-                                  </Sales.Price>
-                                  만원
-                                </span>
-                                ~ 최고
-                                <span>
-                                  <Sales.Price>
-                                    {pyengItem.pricePerRoom[1].toLocaleString()}
-                                  </Sales.Price>
-                                  만원
-                                </span>
-                              </Sales.PyengValue>
-                            </div>
-                            <div>
-                              <Sales.PyengTitle>평당가</Sales.PyengTitle>
-                              <Sales.PyengValue>
-                                최저
-                                <span>
-                                  <Sales.Price>
-                                    {pyengItem.areaPrice[0].toLocaleString()}
-                                  </Sales.Price>
-                                  만원
-                                </span>
-                                ~ 최고
-                                <span>
-                                  <Sales.Price>
-                                    {pyengItem.areaPrice[1].toLocaleString()}
-                                  </Sales.Price>
-                                  만원
-                                </span>
-                              </Sales.PyengValue>
-                            </div>
-                            <Sales.Description>
-                              * 본 홈페이지에 사용된 평면도는 입주자의 이해를
-                              돕기 위해 제작된 것으로 실제와 차이가 있을 수
-                              있으며, 각종 인·허가 과정이나 현장 여건 등에 따라
-                              변경 사항이 있을 수 있습니다.
-                            </Sales.Description>
-                          </Sales.PyengInfo>
-                        </Sales.PyengContent>
+                        <Tabs.Panel key={idx} value={idx}>
+                          <Sales.PyengContent>
+                            <Sales.PyeongImage>
+                              <img
+                                src={`${process.env.REACT_APP_SERVER_IP}/dir/image/${item.url}`}
+                                alt="평면도 이미지"
+                              />
+                            </Sales.PyeongImage>
+                            <Sales.PyengInfo>
+                              <Sales.PyengInner>
+                                <Sales.PyengTitle>
+                                  {item.name} 타입
+                                </Sales.PyengTitle>
+                                <Sales.PyengValue>
+                                  최저
+                                  <span>
+                                    <Sales.Price>
+                                      {item.price?.[0].toLocaleString()}
+                                    </Sales.Price>
+                                    만원
+                                  </span>
+                                  ~ 최고
+                                  <span>
+                                    <Sales.Price>
+                                      {item.price?.[1].toLocaleString()}
+                                    </Sales.Price>
+                                    만원
+                                  </span>
+                                </Sales.PyengValue>
+                              </Sales.PyengInner>
+
+                              <Sales.Description>
+                                * 본 홈페이지에 사용된 평면도는 입주자의 이해를
+                                돕기 위해 제작된 것으로 실제와 차이가 있을 수
+                                있으며, 각종 인·허가 과정이나 현장 여건 등에
+                                따라 변경 사항이 있을 수 있습니다.
+                              </Sales.Description>
+                            </Sales.PyengInfo>
+                          </Sales.PyengContent>
+                        </Tabs.Panel>
                       );
-                    })}
+                    } else {
+                      // PyengWithAreaPrice 타입의 경우
+                      return (
+                        <Tabs.Panel key={idx} value={idx}>
+                          <Sales.PyengContent>
+                            <Sales.PyeongImage>
+                              <img
+                                src={`${process.env.REACT_APP_SERVER_IP}/dir/image/${item.url}`}
+                                alt=""
+                              />
+                            </Sales.PyeongImage>
+                            <Sales.PyengInfo>
+                              <div>
+                                <Sales.PyengTitle>호실당</Sales.PyengTitle>
+                                <Sales.PyengValue>
+                                  최저
+                                  <span>
+                                    <Sales.Price>
+                                      {item.pricePerRoom?.[0].toLocaleString()}
+                                    </Sales.Price>
+                                    만원
+                                  </span>
+                                  ~ 최고
+                                  <span>
+                                    <Sales.Price>
+                                      {item.pricePerRoom?.[1].toLocaleString()}
+                                    </Sales.Price>
+                                    만원
+                                  </span>
+                                </Sales.PyengValue>
+                              </div>
+                              <div>
+                                <Sales.PyengTitle>평당가</Sales.PyengTitle>
+                                <Sales.PyengValue>
+                                  최저
+                                  <span>
+                                    <Sales.Price>
+                                      {item.areaPrice?.[0].toLocaleString()}
+                                    </Sales.Price>
+                                    만원
+                                  </span>
+                                  ~ 최고
+                                  <span>
+                                    <Sales.Price>
+                                      {item.areaPrice?.[1].toLocaleString()}
+                                    </Sales.Price>
+                                    만원
+                                  </span>
+                                </Sales.PyengValue>
+                              </div>
+                              <Sales.Description>
+                                * 본 홈페이지에 사용된 평면도는 입주자의 이해를
+                                돕기 위해 제작된 것으로 실제와 차이가 있을 수
+                                있으며, 각종 인·허가 과정이나 현장 여건 등에
+                                따라 변경 사항이 있을 수 있습니다.
+                              </Sales.Description>
+                            </Sales.PyengInfo>
+                          </Sales.PyengContent>
+                        </Tabs.Panel>
+                      );
+                    }
+                  })}
               </Tabs>
             </Sales.Section>
-            <div>
-              <Sales.SectionTitle>
-                <h4>위치 정보</h4>
-              </Sales.SectionTitle>
-              <Sales.Map>
-                <div>
-                  <KaKaoMap coordinates={map} />
-                </div>
-              </Sales.Map>
-            </div>
+            {data?.map && (
+              <div>
+                <Sales.SectionTitle>
+                  <h4>위치 정보</h4>
+                </Sales.SectionTitle>
+                <Sales.Map>
+                  <div>
+                    <KaKaoMap coordinates={data.map} />
+                  </div>
+                </Sales.Map>
+              </div>
+            )}
           </Sales.AptInfo>
         </div>
       </Sales.Inner>

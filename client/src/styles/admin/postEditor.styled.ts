@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FiUpload } from "react-icons/fi";
+import { AiFillPlusSquare } from "react-icons/ai";
+import { IoClose } from "react-icons/io5";
 
 export const Wrapper = styled.div`
   padding: 20px;
@@ -53,6 +55,13 @@ export const Container = styled.div`
       text-align: left;
     }
   }
+  .check_container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    gap: 0 5px;
+  }
   & .input_content {
     display: flex;
     align-items: center;
@@ -88,8 +97,11 @@ export const Container = styled.div`
         object-fit: contain;
       }
     }
-
-    & .flexBox {
+    & .flex {
+      display: flex;
+      align-items: center;
+    }
+    & .grid {
       display: grid;
       width: 100%;
       grid-template-columns: 150px 10px 150px;
@@ -124,7 +136,8 @@ export const Container = styled.div`
       font-size: 12px;
       font-weight: 500;
       line-height: 18px;
-      cursor: pointer;
+      margin: 0;
+      cursor: unset;
 
       &[type="text"],
       &[type="number"] {
@@ -137,17 +150,15 @@ export const Container = styled.div`
         outline: none;
       }
     }
-
+    .gp-0-5 {
+      gap: 0 5px;
+    }
+    .gp-0-20 {
+      gap: 0 20px;
+    }
     .check_form {
       display: flex;
       gap: 0 30px;
-
-      .check_container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-      }
     }
     .upload_container {
       .input_field {
@@ -266,4 +277,76 @@ export const SubmitBtn = styled.div`
       background: #313541;
     }
   }
+`;
+
+export const PlusIcon = styled(AiFillPlusSquare)`
+  font-size: 30px;
+  color: ${({ theme }) => theme.admColor.gray5};
+  cursor: pointer;
+`;
+
+export const Tab = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0 20px;
+  padding: 20px 0px;
+
+  .tab_list {
+    display: flex;
+    gap: 0 30px;
+  }
+`;
+
+export const Sales = styled.div`
+  position: relative;
+
+  .container {
+    display: flex;
+    gap: 15px 0;
+    flex-direction: column;
+  }
+  .content_info {
+    display: grid;
+    gap: 6px 0;
+  }
+  .list {
+    display: flex;
+    gap: 0 10px;
+    align-items: baseline;
+    flex-wrap: wrap;
+
+    .list_name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .section_title {
+      font-weight: 500;
+    }
+    .section_content {
+      display: flex;
+      align-items: center;
+      gap: 0 10px;
+
+      p {
+        font-weight: 500;
+      }
+    }
+  }
+
+  img {
+    width: 170px;
+    height: 120px;
+    object-fit: cover;
+  }
+`;
+
+export const CloseIcon = styled(IoClose)`
+  font-size: 20px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.admColor.MainColor};
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  cursor: pointer;
 `;

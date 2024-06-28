@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { promotionData } from "../../util/saleData";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
@@ -7,13 +7,31 @@ import Layout from "../../component/Layout";
 import * as Sales from "../../styles/news/saleApartment.styled";
 import PromotionCard from "../../component/news/PromotionCard";
 import Breadcrumb from "../../component/Breadcrumb";
+import {
+  getPostsByCategory,
+  getPromotionPosts,
+} from "../../apis/services/posts";
 
 function SaleApartment() {
   const [state, setState] = useRecoilState(headerStates);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     setState((prev) => ({ ...prev, headerDefault: false }));
     window.scrollTo(0, 0);
+    async function fetchData() {
+      try {
+        const promotions = await getPromotionPosts();
+
+        setData(promotions);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    if (data?.length === 0) {
+      fetchData();
+    }
   }, []);
 
   return (
@@ -34,7 +52,7 @@ function SaleApartment() {
           </Sales.TitleContainer>
 
           <Sales.PromotionCard>
-            {promotionData.map((item, idx) => {
+            {data.map((item, idx) => {
               return <PromotionCard key={idx} data={item} idx={idx} />;
             })}
           </Sales.PromotionCard>

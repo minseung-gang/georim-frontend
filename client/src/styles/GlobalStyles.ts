@@ -40,6 +40,10 @@ button,input,p{
       "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji",
       "Segoe UI Symbol", sans-serif;
 }
+input,button{
+	margin:0;
+	padding:0;
+}
 `;
 
 export default GlobalStyle;

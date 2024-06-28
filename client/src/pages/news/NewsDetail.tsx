@@ -22,7 +22,7 @@ function NewsDetail() {
 
   const buildOrd = parseInt(searchParams.get("build_ord") ?? "") - 1;
   const layoutType = parseInt(searchParams.get("layout_type") ?? "");
-  console.log(buildOrd, layoutType, newsData, newsData[buildOrd]);
+
   let LayoutComponent: React.ComponentType<{ data: NewsDataType }> | undefined;
 
   switch (layoutType) {

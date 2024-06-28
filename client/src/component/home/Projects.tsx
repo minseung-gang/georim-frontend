@@ -6,18 +6,26 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-coverflow";
-import { salesData } from "../../util/saleData";
 import { useNavigate } from "react-router-dom";
 import useHoverCursor from "../../hook/useHoverCursor";
+import { ICardType } from "../../types/type";
 
-function Projects() {
-  const [swiper, setSwiper] = useState<SwiperClass>();
+interface ProjectsProps {
+  props: ICardType[];
+}
+function Projects({ props }: ProjectsProps) {
+  const [data, setData] = useState(props);
+  console.log('data,')
+  const [swiper, setSwiper] = useState<SwiperClass>();  
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const [data, setData] = useState(salesData.slice(0, 6));
   const navigate = useNavigate();
 
   const { cursor, handleHover, handleLeave } = useHoverCursor();
+  useEffect(() => {
+    setData(props.slice(0,7));
+  }, [props]);
+
   useEffect(() => {
     // 이벤트 핸들러 추가
     window.addEventListener("mousemove", cursor);
@@ -59,10 +67,8 @@ function Projects() {
         <Swiper
           modules={[Navigation, Pagination, Controller, Autoplay]}
           spaceBetween={20}
-          autoplay={{ delay: 3000, disableOnInteraction: false }}
-          slidesPerView={4.15}
+          slidesPerView={4}
           centeredSlides={false}
-          allowTouchMove={false}
           pagination={{
             el: ".swiper-pagination", // pagination 컴포넌트를 표시할 위치 지정
             clickable: true, // pagination 버튼 클릭 가능 여부
@@ -116,16 +122,19 @@ function Projects() {
         >
           {data.map((item, idx) => {
             return (
-              <SwiperSlide key={item.img + idx}>
+              <SwiperSlide key={idx + item.name}>
                 <Pro.BuildingContainer
                   onMouseEnter={handleHover}
                   onMouseLeave={handleLeave}
                   onClick={() => navigate(`/project/sales/${item.id}`)}
                 >
-                  <Pro.SwiperImg src={item.img} alt={item.img} />
+                  <Pro.SwiperImg
+                    src={`${process.env.REACT_APP_SERVER_IP}/dir/image/${item.url}`}
+                    alt={item.name}
+                  />
                   <Pro.BuildingContent>
                     <Pro.BuildingName>
-                      <p>{item.category}</p>
+                      <p>{item.type.join(", ")}</p>
                       <h4>{item.name}</h4>
                     </Pro.BuildingName>
                     <span>100% 분양완료</span>

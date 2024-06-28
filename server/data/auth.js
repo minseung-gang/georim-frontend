@@ -4,7 +4,6 @@ export async function findByUsername(username) {
   return db
     .execute("SELECT * FROM users WHERE username=?", [username])
     .then((result) => {
-      console.log(result[0][0], "findByUserName - posts");
       return result[0][0];
     });
 }

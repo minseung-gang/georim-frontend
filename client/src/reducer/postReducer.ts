@@ -6,9 +6,10 @@ type Action = {
 export type State = {
   name: string;
   category: string;
-  url: File | null;
+  url: string | "";
+  view: string | "";
   image: File | null;
-  developmentDate: Date;
+  developmentDate: string;
   type: string[];
   address: string;
   houseHold: string;
@@ -18,13 +19,22 @@ export type State = {
   buildingCoverRatio: number;
   lotArea: number;
   totalFloorArea: number;
+  status: number;
+  hasPromotion: boolean;
+  pyeng: string[];
+  fileLink: string;
+  homepage: string;
+  phone: string | "";
+  isDeleted: boolean;
 };
 
 export const initialState = {
   name: "",
   category: "",
-  url: null,
+  url: "",
+  view: "",
   image: null,
+  developmentDate: "",
   type: [],
   address: "",
   houseHold: "",
@@ -34,7 +44,13 @@ export const initialState = {
   buildingCoverRatio: 0,
   lotArea: 0,
   totalFloorArea: 0,
-  developmentDate: "",
+  status: 0,
+  hasPromotion: false,
+  pyeng: [],
+  fileLink: "",
+  homepage: "",
+  phone: "",
+  isDeleted: false,
 };
 
 export const reducer = (state: State, action: Action) => {
@@ -43,8 +59,8 @@ export const reducer = (state: State, action: Action) => {
       return { ...state, name: action.payload };
     case "UPDATE_CATEGORY":
       return { ...state, category: action.payload };
-    case "UPDATE_URL":
-      return { ...state, url: action.payload };
+    case "UPDATE_VIEW":
+      return { ...state, view: action.payload };
     case "UPDATE_IMAGE":
       return { ...state, image: action.payload };
     case "UPDATE_DEVELOPMENT_DATE":
@@ -81,17 +97,18 @@ export const reducer = (state: State, action: Action) => {
       return { ...state, lotArea: action.payload };
     case "UPDATE_TOTAL_FLOOR_AREA":
       return { ...state, totalFloorArea: action.payload };
+    case "UPDATE_PHONE":
+      return { ...state, phone: action.payload };
     case "RESET_ALL":
       return { ...initialState };
-    case "UPDATE_ALL":
-      const filteredType = action.payload.type.split(", ");
 
+    case "UPDATE_ALL":
       return {
         name: action.payload.name,
         category: action.payload.category,
         url: action.payload.url,
         image: action.payload.image,
-        type: filteredType,
+        type: action.payload.type,
         address: action.payload.address,
         houseHold: action.payload.houseHold,
         lowFloor: action.payload.lowFloor,
@@ -101,7 +118,40 @@ export const reducer = (state: State, action: Action) => {
         lotArea: action.payload.lotArea,
         totalFloorArea: action.payload.totalFloorArea,
         developmentDate: action.payload.developmentDate,
+        status: action.payload.status,
+        hasPromotion: action.payload.hasPromotion,
+        pyeng: action.payload.pyeng,
+        fileLink: action.payload.fileLink,
+        homepage: action.payload.homepage,
+        phone: action.payload.phone,
+        isDeleted: false,
+        view: "",
       };
+    case "UPDATE_PYENG":
+      return { ...state, pyeng: action.payload };
+    case "ADD_PYENG":
+      return { ...state, pyeng: [...state.pyeng, ...action.payload] };
+    case "DELETE_PYENG":
+      let filteredData = state.pyeng.filter((item, idx) => {
+        return idx !== action.payload;
+      });
+      return { ...state, pyeng: filteredData };
+    case "DELETE_PYENG_AND_SET_DELETED":
+      let data = state.pyeng.filter((item, idx) => {
+        return idx !== action.payload;
+      });
+      if (data.length === 0) {
+        data = [];
+      }
+      return { ...state, isDeleted: true, pyeng: data };
+    case "UPDATE_HOMEPAGE":
+      return { ...state, homepage: action.payload };
+    case "UPDATE_FILELINK":
+      return { ...state, fileLink: action.payload };
+    case "UPDATE_STATUS":
+      return { ...state, status: action.payload };
+    case "UPDATE_HAS_PROMOTION":
+      return { ...state, hasPromotion: action.payload };
     default:
       return state;
   }

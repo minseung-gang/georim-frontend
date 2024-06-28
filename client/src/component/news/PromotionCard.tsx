@@ -11,7 +11,7 @@ interface PromotionCardProps {
 }
 
 function PromotionCard({ data, idx }: PromotionCardProps) {
-  const { image, status, name, category } = data;
+  const { id, url, status, name, type, developmentDate } = data;
   const [isHovered, setIsHoverd] = useState(false);
   const [delayNum, setDelayNum] = useState(0);
   const hoverEventHandler = () => {
@@ -58,15 +58,16 @@ function PromotionCard({ data, idx }: PromotionCardProps) {
       viewport={{ once: true, amount: 0 }}
     >
       <Sales.Card
-        onClick={() => moveToPage(idx + 1)}
+        onClick={() => moveToPage(id)}
         onMouseEnter={hoverEventHandler}
       >
         <Sales.CardImageBox>
-          <Image src={image} alt={name} />
-          {status == "completed" && (
-            <Sales.Status translate="no">분양중</Sales.Status>
-          )}
-          {status == "inspected" && (
+          <Image
+            src={`${process.env.REACT_APP_SERVER_IP}/dir/image/${url}`}
+            alt={name}
+          />
+          {status == "2" && <Sales.Status translate="no">분양중</Sales.Status>}
+          {status == "1" && (
             <Sales.Status translate="no">준공후 분양중</Sales.Status>
           )}
           <Sales.BtnBox className="arrow_btn" $active={isHovered}>
@@ -81,9 +82,9 @@ function PromotionCard({ data, idx }: PromotionCardProps) {
 
           <motion.div initial={{ opacity: 0, x: 50 }} variants={textVariants}>
             <Sales.DetailInfo>
-              <Sales.Category translate="no">{category}</Sales.Category>
+              <Sales.Category translate="no">{type.join(", ")}</Sales.Category>
               <Sales.Bar />
-              <Sales.InDate>2024.05</Sales.InDate>
+              <Sales.InDate>{developmentDate}</Sales.InDate>
             </Sales.DetailInfo>
           </motion.div>
         </Sales.CardInfo>

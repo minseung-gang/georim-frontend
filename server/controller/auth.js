@@ -2,8 +2,6 @@ import bcrypt from "bcrypt";
 import * as userRepository from "../data/auth.js";
 import * as Token from "../utils/token.js";
 import { config } from "../config.js";
-import jwt from "jsonwebtoken";
-import cookieParser from "cookie-parser";
 
 export async function signup(req, res) {
   const { username, password } = req.body;
@@ -12,7 +10,7 @@ export async function signup(req, res) {
     return res.status(409).json({ message: `${username} already exists` });
   }
   const hashed = await bcrypt.hash(password, config.bcrypt.saltRounds);
-  console.log(hashed);
+
   const userId = await userRepository.createUser({
     username,
     password: hashed,
@@ -43,8 +41,6 @@ export async function login(req, res) {
   const accessToken = Token.setAccessToken(user.id);
 
   const refreshToken = Token.setAccessToken();
-  console.log(accessToken, "로그인 토큰");
-  console.log(refreshToken, "로그인 리프레시");
 
   // refresh token 쿠키로 전달
   res.cookie("token", refreshToken, {
@@ -74,8 +70,7 @@ export async function logout(req, res, next) {
 export async function checkAuth(req, res, next) {
   const user = await userRepository.findById(req.userId);
   const refreshToken = req.headers.cookie;
-  console.log("user", user);
-  console.log("refresh", refreshToken);
+
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }

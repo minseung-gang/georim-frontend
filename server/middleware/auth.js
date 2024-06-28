@@ -15,20 +15,20 @@ export const isAuth = async (req, res, next) => {
   }
 
   const token = authHeader.split(" ")[1];
+
   // 토큰이 있을 때 검증
   const user = await Token.verifyAccessToken(token);
-  console.log(req.userId);
+
   req.userId = user.id; // req.customData
   next();
 };
 
 export async function refresh(req, res, next) {
   const { username } = req.query;
-  console.log(username, "username");
+
   const user = await userRepository.findByUsername(username);
   const refreshToken = req.headers.cookie;
-  console.log("user", user);
-  console.log("refresh", refreshToken);
+
   if (req.headers.cookie) {
     // access토큰이 만료되거나 새로고침되어 없고
     // refresh token은 만료되지 않은 경우 => 새로운 access token을 발급

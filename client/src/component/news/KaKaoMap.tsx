@@ -7,15 +7,18 @@ import {
   Polygon,
 } from "react-kakao-maps-sdk";
 
-interface CoordinatesType {
-  center: { lat: number; lng: number };
-  bounds: { lat: number; lng: number }[];
-}
+type CoordinatesType = {
+  center: {
+    lat: number;
+    lng: number;
+  };
+  bounds: {
+    lat: number;
+    lng: number;
+  }[];
+};
 
-interface KaKaoMapProps {
-  coordinates: CoordinatesType;
-}
-function KaKaoMap({ coordinates }: KaKaoMapProps) {
+function KaKaoMap({ coordinates }: { coordinates: CoordinatesType }) {
   const { center, bounds } = coordinates;
   const [latitude, setLatitude] = useState<number>(center.lat);
   const [longitude, setLongitude] = useState<number>(center.lng);

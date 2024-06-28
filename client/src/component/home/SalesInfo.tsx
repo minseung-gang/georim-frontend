@@ -5,16 +5,38 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { useNavigate } from "react-router-dom";
 import useHoverCursor from "../../hook/useHoverCursor";
 import { Navigation, Autoplay } from "swiper/modules";
+import { ICardType } from "../../types/type";
 
-function SalesInfo() {
-  const [data, setData] = useState(promotionData.slice(0, 4));
+interface Salesrops {
+  props: ICardType[];
+}
+
+function SalesInfo({ props }: Salesrops) {
+  const [data, setData] = useState<ICardType[]>([]);
   const { cursor, handleHover, handleLeave } = useHoverCursor();
   const [dataInfo, setDataInfo] = useState({
-    pricePerRoom: [1503, 3964],
-    areaPrice: [29200, 191000],
-    url: data[0].image,
+    pricePerUnit: ["", ""],
+    pricePerArea: ["", ""],
+    url: "",
   });
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setDataInfo({
+      pricePerUnit: [
+        props[0]?.pyeng?.[0]?.areaPrice?.[0] ?? "",
+        props[0]?.pyeng?.[0]?.areaPrice?.[1] ?? "",
+      ],
+      pricePerArea: [
+        props[0]?.pyeng?.[0]?.pricePerRoom?.[0] ?? "",
+        props[0]?.pyeng?.[0]?.pricePerRoom?.[1] ?? "",
+      ],
+      url: props[0]?.pyeng?.[0]?.url,
+    });
+
+    setData(props.slice(0, 4));
+  }, [props]);
 
   useEffect(() => {
     // 이벤트 핸들러 추가
@@ -27,13 +49,13 @@ function SalesInfo() {
   }, []);
 
   const mouseHoverHandler = (
-    pricePerRoom: number[],
-    areaPrice: number[],
+    pricePerRoom: string[],
+    areaPrice: string[],
     url: string
   ) => {
     setDataInfo({
-      pricePerRoom: pricePerRoom,
-      areaPrice: areaPrice,
+      pricePerUnit: pricePerRoom,
+      pricePerArea: areaPrice,
       url,
     });
     handleHover();
@@ -53,14 +75,24 @@ function SalesInfo() {
       <Sales.BrowserContent>
         <Sales.FlexBox className="inner flex-column gap-y-8 justify-center">
           {data.map((item, idx) => {
+            const communityData = item.pyeng.find(
+              (p) => p.type === "community"
+            );
+
             return (
               <Sales.ContentDetails
                 key={item.name + idx}
                 onMouseEnter={() =>
                   mouseHoverHandler(
-                    item.pyeng[0].areaPrice as number[],
-                    item.pyeng[0].pricePerRoom as number[],
-                    item.image
+                    [
+                      communityData?.areaPrice?.[0] ?? "",
+                      communityData?.areaPrice?.[1] ?? "",
+                    ],
+                    [
+                      communityData?.pricePerRoom?.[0] ?? "",
+                      communityData?.pricePerRoom?.[1] ?? "",
+                    ],
+                    item.url
                   )
                 }
                 onMouseLeave={handleLeave}
@@ -71,8 +103,8 @@ function SalesInfo() {
                 <Sales.Card className="card">
                   <Sales.ItemName>{item.name}</Sales.ItemName>
                   <Sales.FlexBox className="oth-info gap-x-31">
-                    <p className="location_text">{item.location}</p>
-                    <p className="category_text">{item.category}</p>
+                    <p className="location_text">{item.address}</p>
+                    <p className="category_text">{item.type.join(", ")}</p>
                   </Sales.FlexBox>
                 </Sales.Card>
                 <Sales.ArrowContainer>
@@ -88,21 +120,25 @@ function SalesInfo() {
           })}
         </Sales.FlexBox>
         <Sales.Image $link={dataInfo.url}>
+          <img
+            src={`${process.env.REACT_APP_SERVER_IP}/dir/image/${dataInfo.url}`}
+            alt="분양정보 이미지"
+          />
           <Sales.ImageContainer className="m-t-24">
             <span className="sticker">분양중</span>
             <div>
               <Sales.PriceInfo>
                 <p>분양가</p>
                 <p className="sl-price">
-                  {dataInfo.areaPrice[0].toLocaleString()}만원 - 최고{" "}
-                  {dataInfo.areaPrice[1].toLocaleString()}만원
+                  {dataInfo.pricePerUnit[0].toLocaleString()}만원 - 최고{" "}
+                  {dataInfo.pricePerUnit[1].toLocaleString()}만원
                 </p>
               </Sales.PriceInfo>
               <Sales.PriceInfo>
                 <p>평당가</p>
                 <p className="py-price">
-                  {dataInfo.pricePerRoom[0].toLocaleString()}만원 - 최고{" "}
-                  {dataInfo.pricePerRoom[1].toLocaleString()}만원
+                  {dataInfo.pricePerArea[0] /* .toLocaleString() */}만원 - 최고{" "}
+                  {dataInfo.pricePerArea[1] /* .toLocaleString() */}만원
                 </p>
               </Sales.PriceInfo>
             </div>
@@ -141,13 +177,16 @@ function SalesInfo() {
                 <Sales.SwiperContainer>
                   <Sales.SwiperContent>
                     <Sales.SwiperImage>
-                      <img src={item.image} alt={item.image} />
+                      <img
+                        src={`${process.env.REACT_APP_SERVER_IP}/dir/image/${item.url}`}
+                        alt={item.name}
+                      />
                       <Sales.Status className="status">분양중</Sales.Status>
                     </Sales.SwiperImage>
                     <Sales.SwiperDetails>
                       <Sales.BuildingName>{item.name}</Sales.BuildingName>
                       <Sales.BuildingAddress>
-                        {item.location}
+                        {item.address}
                       </Sales.BuildingAddress>
                     </Sales.SwiperDetails>
                   </Sales.SwiperContent>

@@ -135,7 +135,7 @@ export const FullPageScroll: React.FC<PFullPageScroll> = ({
   const onTouchUp = (e: TouchEvent) => {
     const currentTouchY = e.changedTouches[0].clientY;
     const isScrollDown: boolean = oldTouchY.current - currentTouchY > 0;
-    console.log(oldTouchY.current - currentTouchY);
+
     if (Math.abs(oldTouchY.current - currentTouchY) < 50) return;
 
     if (isScrollDown) {
@@ -206,8 +206,12 @@ export const FullPageScroll: React.FC<PFullPageScroll> = ({
   useEffect(() => {
     const outer = outerDivRef.current;
     outerDivRef.current?.focus();
-    if (!outer) return;
-    onLoad(outerDivRef.current.childElementCount);
+    const childCount = outer?.childElementCount;
+    const isFooterPresent =
+      outer?.lastElementChild?.classList.contains("footer") ?? false;
+    if (!outer || !childCount) return;
+    /*  onLoad(outerDivRef.current.childElementCount); */
+    onLoad(isFooterPresent ? childCount - 1 : childCount);
     refresh((v) => v + 1);
     outer.addEventListener("wheel", wheelHandler);
     outer.addEventListener("scroll", scrollHandler);
@@ -241,7 +245,10 @@ export const FullPageScroll: React.FC<PFullPageScroll> = ({
         {children}
       </div>
       <Dots
-        limit={outerDivRef.current?.childElementCount || 0}
+        limit={
+          (outerDivRef.current && outerDivRef.current?.childElementCount - 1) ||
+          0
+        }
         currentIndex={currentPage.current}
       />
     </>

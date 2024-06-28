@@ -72,6 +72,7 @@
   },
   "devDependencies": {
     "@types/swiper": "^6.0.0",
+    "eslint": "^8.57.0",
     "throttle-debounce-ts": "^1.1.1"
   }
 }

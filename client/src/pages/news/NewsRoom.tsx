@@ -17,7 +17,7 @@ function NewsRoom() {
 
   const data = useRef<NewsDataType[]>(sortedData);
   const [activeIndex, setActiveIndex] = useState(0);
-  console.log(data);
+
   const navigate = useNavigate();
 
   useEffect(() => {

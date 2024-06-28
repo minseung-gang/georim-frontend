@@ -133,6 +133,9 @@ export const LNB = styled.ul<{ $active: boolean; $visible: boolean }>`
   padding: 25px 0;
   pointer-events: ${(props) => (props.$active ? "auto" : "none")};
   display: ${(props) => (props.$visible ? "block" : "none")};
+  @media screen and (max-width: 1440px) {
+    top: 80px;
+  }
 `;
 export const LnbList = styled.ul`
   overflow: hidden;

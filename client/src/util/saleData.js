@@ -560,7 +560,7 @@ export const promotionData = [
     image: process.env.PUBLIC_URL + "/images/sales_43.png",
     pyeng: [
       {
-        type: "default",
+        type: "근린생활시설",
         image: process.env.PUBLIC_URL + "/images/pyeng_03_default.png",
         pricePerRoom: [33257, 102179],
         areaPrice: [1020, 3480],

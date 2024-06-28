@@ -34,3 +34,37 @@ export interface IDataType {
   totalFloorArea: number;
   developmentDate: string;
 }
+
+export interface ICardType {
+  id: number;
+  name: string;
+  category: string;
+  url: string | "";
+  developmentDate: string;
+  type: string[];
+  address: string;
+  houseHold: string;
+  lowFloor: string;
+  highFloor: string;
+  floorAreaRatio: number;
+  buildingCoverRatio: number;
+  lotArea: number;
+  totalFloorArea: number;
+  fileLink: string;
+  map: {
+    center: { lat: number; lng: number };
+    bounds: { lat: number; lng: number }[];
+  };
+  phone: string;
+  status: string;
+  pyeng: {
+    areaPrice?: string[];
+    pricePerRoom?: string[];
+    price?: string[];
+    name: string;
+    type: string;
+    url: string;
+  }[];
+
+  homepage: string;
+}

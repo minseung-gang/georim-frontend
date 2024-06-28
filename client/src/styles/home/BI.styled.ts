@@ -136,6 +136,7 @@ export const TitleCaption = styled.div<{ $active: boolean }>`
     @media screen and (max-width: 500px) {
       font-size: 1.75rem;
       line-height: 2.625rem;
+      width: auto;
     }
   }
 `;

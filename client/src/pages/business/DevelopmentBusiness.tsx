@@ -19,15 +19,23 @@ import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import { isMobile } from "react-device-detect";
+import { getPostsByCategory } from "../../apis/services/posts";
+import { ICardType } from "../../types/type";
 
 function DevelopmentBusiness() {
   const [state, setState] = useRecoilState(headerStates);
+  const [swiperList, setSwiperList] = useState<ICardType[]>([]);
   const navigate = useNavigate();
   useEffect(() => {
     setState((prev) => ({ ...prev, headerDefault: false }));
     window.scrollTo({
       top: 0,
     });
+    async function getPostData() {
+      const response = await getPostsByCategory("development");
+      setSwiperList(response);
+    }
+    getPostData();
   }, []);
 
   const { scrollYProgress, position, scrollRef, ref } = useScroll();
@@ -499,7 +507,7 @@ function DevelopmentBusiness() {
               <span>PROJECTS</span>
               <Biz.TextLine>
                 <motion.h4
-                  initial={isMobile ? { y: 30 } : { y: 55 }}
+                  initial={isMobile ? { y: 30 } : { y: 50 }}
                   variants={titleVariants}
                   transition={{ duration: 0.6, delay: 0.4 }}
                   whileInView="onscreen"
@@ -546,78 +554,80 @@ function DevelopmentBusiness() {
                   prevEl: "#swiper-back",
                 }}
               >
-                {data.map((item, idx) => {
-                  const lowerFloor = item.scale.split("/")[0];
-                  const higherFloor = item.scale.split("/")[1];
-                  return (
-                    <SwiperSlide key={item.name + idx}>
-                      <Biz.SwiperCard className="card">
-                        <Dev.ImageBox>
-                          <img
-                            width={380}
-                            height={270}
-                            src={item.img}
-                            alt="빌딩 이미지"
-                          />
-                        </Dev.ImageBox>
-                        <Dev.CardContent>
-                          <Biz.TextLine>
-                            <motion.div
-                              variants={subTitle}
-                              viewport={{ once: true, amount: 0.2 }}
-                            >
-                              <Dev.BuildingsName className="buildings_name">
-                                {item.name}
-                              </Dev.BuildingsName>
-                            </motion.div>
-                          </Biz.TextLine>
-                          <Dev.ContentInfo>
+                {swiperList.length > 0 &&
+                  swiperList.map((item, idx) => {
+                    return (
+                      <SwiperSlide key={item.name + idx}>
+                        <Biz.SwiperCard className="card">
+                          <Dev.ImageBox>
+                            <img
+                              width={380}
+                              height={270}
+                              src={`${
+                                process.env.REACT_APP_SERVER_IP
+                              }/dir/image/${item.url}?${Date.now()}`}
+                              alt={item.name}
+                            />
+                          </Dev.ImageBox>
+                          <Dev.CardContent>
                             <Biz.TextLine>
                               <motion.div
                                 variants={subTitle}
                                 viewport={{ once: true, amount: 0.2 }}
                               >
-                                <Dev.ContentItem>
-                                  <Dev.TitleInfo>구분</Dev.TitleInfo>
-                                  <Dev.ContentDetails>
-                                    {item.category}
-                                  </Dev.ContentDetails>
-                                </Dev.ContentItem>
+                                <Dev.BuildingsName className="buildings_name">
+                                  {item.name}
+                                </Dev.BuildingsName>
                               </motion.div>
                             </Biz.TextLine>
+                            <Dev.ContentInfo>
+                              <Biz.TextLine>
+                                <motion.div
+                                  variants={subTitle}
+                                  viewport={{ once: true, amount: 0.2 }}
+                                >
+                                  <Dev.ContentItem>
+                                    <Dev.TitleInfo>구분</Dev.TitleInfo>
+                                    <Dev.ContentDetails>
+                                      {item.type}
+                                    </Dev.ContentDetails>
+                                  </Dev.ContentItem>
+                                </motion.div>
+                              </Biz.TextLine>
 
-                            <Biz.TextLine>
-                              <motion.div
-                                variants={subTitle}
-                                viewport={{ once: true, amount: 0.2 }}
-                              >
-                                <Dev.ContentItem>
-                                  <Dev.TitleInfo>세대수</Dev.TitleInfo>
-                                  <Dev.ContentDetails>
-                                    {item.houseHoldSum}
-                                  </Dev.ContentDetails>
-                                </Dev.ContentItem>
-                              </motion.div>
-                            </Biz.TextLine>
-                            <Biz.TextLine>
-                              <motion.div
-                                variants={subTitle}
-                                viewport={{ once: true, amount: 0.2 }}
-                              >
-                                <Dev.ContentItem>
-                                  <Dev.TitleInfo>규모</Dev.TitleInfo>
-                                  <Dev.ContentDetails>
-                                    {lowerFloor} - {higherFloor}
-                                  </Dev.ContentDetails>
-                                </Dev.ContentItem>
-                              </motion.div>
-                            </Biz.TextLine>
-                          </Dev.ContentInfo>
-                        </Dev.CardContent>
-                      </Biz.SwiperCard>
-                    </SwiperSlide>
-                  );
-                })}
+                              <Biz.TextLine>
+                                <motion.div
+                                  variants={subTitle}
+                                  viewport={{ once: true, amount: 0.2 }}
+                                >
+                                  <Dev.ContentItem>
+                                    <Dev.TitleInfo>세대수</Dev.TitleInfo>
+                                    <Dev.ContentDetails>
+                                      {item.houseHold}
+                                    </Dev.ContentDetails>
+                                  </Dev.ContentItem>
+                                </motion.div>
+                              </Biz.TextLine>
+                              <Biz.TextLine>
+                                <motion.div
+                                  variants={subTitle}
+                                  viewport={{ once: true, amount: 0.2 }}
+                                >
+                                  <Dev.ContentItem>
+                                    <Dev.TitleInfo>규모</Dev.TitleInfo>
+                                    <Dev.ContentDetails>
+                                      지하 {item.lowFloor}층 - 지상{" "}
+                                      {item.highFloor}층
+                                    </Dev.ContentDetails>
+                                  </Dev.ContentItem>
+                                </motion.div>
+                              </Biz.TextLine>
+                            </Dev.ContentInfo>
+                          </Dev.CardContent>
+                        </Biz.SwiperCard>
+                      </SwiperSlide>
+                    );
+                  })}
               </Swiper>
 
               <Biz.ProjectOverview>

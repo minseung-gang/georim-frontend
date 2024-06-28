@@ -6,20 +6,14 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import Image from "../LazyImage";
 import useHoverCursor from "../../hook/useHoverCursor";
 import useIntersectionObserver from "../../hook/useIntersectionObserver";
+import { State } from "../../reducer/postReducer";
+import { ICardType } from "../../types/type";
 
-interface Props {
-  data: {
-    id: number;
-    name: string;
-    category: string;
-    img: string;
-    location: string;
-    houseHoldSum: string;
-    scale: string;
-  }[];
+export interface ICardProps {
+  data: ICardType[];
 }
 
-function Card({ data }: Props) {
+function Card({ data }: ICardProps) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const itemPerPage = 6;
@@ -49,7 +43,7 @@ function Card({ data }: Props) {
         startIndex + itemPerPage
       ); // 새로운 페이지에 해당하는 데이터 가져오기
       pageRef.current = newPage; // 현재 페이지 업데이트
-      console.log(listRef.current, additionalData);
+
       if (additionalData.length > 0) {
         setList((prevList) => [...prevList, ...additionalData]);
       }
@@ -62,18 +56,18 @@ function Card({ data }: Props) {
   return (
     <Dev.GridContainer className="card-list">
       {List.map((item, idx) => {
-        const lowerFloor = item.scale.split("/")[0];
-        const higherFloor = item.scale.split("/")[1];
         return (
           <Dev.BuildingsCard
-            onClick={() => navigate(`/project/sales/${item.id}`)}
+            onClick={() => navigate(`/project/${item.category}/${item.id}`)}
             key={idx}
             onMouseEnter={handleHover}
             onMouseLeave={handleLeave}
           >
             <Dev.ImageBox>
               <Image
-                src={item.img}
+                src={`${process.env.REACT_APP_SERVER_IP}/dir/image/${
+                  item.url
+                }?${Date.now()}`}
                 alt="빌딩 이미지"
                 width={380}
                 height={280}
@@ -86,16 +80,18 @@ function Card({ data }: Props) {
               <Dev.ContentInfo>
                 <Dev.ContentItem>
                   <Dev.TitleInfo>구분</Dev.TitleInfo>
-                  <Dev.ContentDetails>{item.category}</Dev.ContentDetails>
+                  <Dev.ContentDetails>
+                    {item.type.join(", ")}
+                  </Dev.ContentDetails>
                 </Dev.ContentItem>
                 <Dev.ContentItem>
                   <Dev.TitleInfo>세대수</Dev.TitleInfo>
-                  <Dev.ContentDetails>{item.houseHoldSum}</Dev.ContentDetails>
+                  <Dev.ContentDetails>{item.houseHold}</Dev.ContentDetails>
                 </Dev.ContentItem>
                 <Dev.ContentItem>
                   <Dev.TitleInfo>규모</Dev.TitleInfo>
                   <Dev.ContentDetails>
-                    {lowerFloor} - {higherFloor}
+                    지하 {item.lowFloor}층 - 지상 {item.highFloor}층
                   </Dev.ContentDetails>
                 </Dev.ContentItem>
               </Dev.ContentInfo>

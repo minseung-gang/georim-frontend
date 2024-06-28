@@ -4,7 +4,7 @@ import http from "http";
 import path from "path";
 import cors from "cors";
 import morgan from "morgan";
-/* import helmet from "helmet"; */
+import helmet from "helmet";
 import authRouter from "./router/auth.js";
 import postsRouter from "./router/posts.js";
 import { config } from "./config.js";
@@ -13,10 +13,14 @@ const __dirname = path.resolve();
 const app = express();
 
 app.use(express.json());
-/* app.use(helmet()); */
+app.use(helmet());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:8080",
+      "http://www.georim.net",
+    ],
     credentials: true,
   })
 );
@@ -29,15 +33,9 @@ app.get("/dir/image/:imageName", function (req, res) {
   res.sendFile(path.join(__dirname, "/dir/image", imgName));
 });
 
-app.use("/auth", authRouter);
-app.use("/posts", postsRouter);
-app.get("/test", (req, res, next) => {
-  const refreshToken = req.cookies.token;
-  console.log(req.cookies, " 쿠키1");
-  console.log(refreshToken, "쿠키2");
-  console.log(req.headers.cookie, "쿠키3");
-  res.status(200).json({ message: refreshToken });
-});
+app.use("/api/auth", authRouter);
+app.use("/api/posts", postsRouter);
+
 app.use((req, res, next) => {
   res.sendStatus(404);
 });
